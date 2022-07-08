@@ -3,7 +3,6 @@ import { CreateTaskDTO } from './dtos/task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task, TaskStatus } from './task.entity';
-import { UpdateStatusDTO } from './dtos/update-status.dto';
 
 @Injectable()
 export class TaskService {
@@ -11,6 +10,7 @@ export class TaskService {
     @InjectRepository(Task)
     private tasksRepository: Repository<Task>,
   ) {}
+
   async getAllTasks(): Promise<Task[]> {
     return this.tasksRepository.find();
   }
@@ -32,18 +32,28 @@ export class TaskService {
   async toggleTask(taskId: number): Promise<boolean> {
     const _old = await this.tasksRepository.findOneBy({ id: taskId });
     if (!_old || !_old.id) return false;
-    const _new = { ..._old, completed: !_old.status };
+    const _new = { ..._old, status: TaskStatus.inprogress };
     await this.tasksRepository.update({ id: taskId }, _new);
     return true;
   }
 
-  async setAllStatuses(status: TaskStatus) {
-    console.log({ status });
-    const query = this.tasksRepository
-      .createQueryBuilder()
-      .update()
-      .set({ status });
+  async deleteTask(taskId: number) {
+    await this.tasksRepository.delete(taskId);
+  }
 
-    await query.execute();
+  async deleteAllTasks() {
+    const records = this.getAllTasks();
+    (await records).forEach((task) => {
+      this.tasksRepository.delete(task.id);
+    });
+  }
+
+  async setAllStatuses(status: TaskStatus) {
+    const records = this.getAllTasks();
+    (await records).forEach((task) => {
+      task.status = status;
+      this.tasksRepository.save(task);
+    });
+    return status;
   }
 }
