@@ -21,3 +21,11 @@ $ npm run start
 ```
 
 Your API should be all set to go!
+
+## Built at Alteryx
+
+<p align="center">
+  <a href="https://www.alteryx.com/open-source">
+    <img src="https://alteryx-oss-web-images.s3.amazonaws.com/OpenSource_Logo-01.png" alt="Alteryx Open Source" width="800"/>
+  </a>
+</p>
